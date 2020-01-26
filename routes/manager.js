@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const { setallowPayment, setdisallowPayment, getTotalIncome, getTotalPay, getSituation } = require('../controller/manager')
+const { setallowPayment, setdisallowPayment, getTotalIncome, getTotalPay, getSituation, getTimes } = require('../controller/manager')
 const { checkParams } = require('../utils/methods')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 
@@ -76,6 +76,20 @@ router.post('/report/two', async function (req, res, next) {
   }
   const getSuggess = getSituation(page, size)
   return getSuggess.then(data => {
+    res.json(
+      new SuccessModel(data)
+    )
+    return
+  });
+});
+
+router.post('/report/three', async function (req, res, next) {
+  let checkResult = await checkPower(req.session, res)
+  if (!checkResult) {
+      return;
+  }
+  const times = getTimes()
+  return times.then(data => {
     res.json(
       new SuccessModel(data)
     )
