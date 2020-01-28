@@ -5,7 +5,7 @@ const { checkParams } = require('../utils/methods')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 
 router.post('/room/list', async function (req, res, next) {
-    const { page, size, type, q } = req.body
+    const { page, size, type, q, roomtype } = req.body
     let paramsResult = await checkParams(res, page, size)
     if (!paramsResult) {
         return;
@@ -14,7 +14,7 @@ router.post('/room/list', async function (req, res, next) {
     if (!checkResult) {
         return;
     }
-    const result = getFrontRoomList(page, size, type, q)
+    const result = getFrontRoomList(page, size, type, q, roomtype)
     return result.then(data => {
         if (data.rows) {
             res.json(

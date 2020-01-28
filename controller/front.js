@@ -1,8 +1,8 @@
 const { exec } = require('../db/mysql')
 
-const getFrontRoomList = (page, size, type, q) => {
+const getFrontRoomList = (page, size, type, q, roomtype) => {
   let sql = `
-      select id, number, price, isClean, isBook, booktime, isRent, customerName, livetime, customerIdentity, preLiveTime, isLive, cleantime, cleaner, tel, deposit from rooms where 1 = 1
+      select id, type, number, price, isClean, isBook, booktime, isRent, customerName, livetime, customerIdentity, preLiveTime, isLive, cleantime, cleaner, tel, deposit from rooms where 1 = 1
   `
   if (type == 'book') {
     sql += `
@@ -11,6 +11,12 @@ const getFrontRoomList = (page, size, type, q) => {
   } else if (type == 'live') {
     sql += `
       and isLive = 1
+    `
+  }
+  if (roomtype && roomtype != " ") {
+    console.log(1)
+    sql += `
+      and type = '${roomtype}'
     `
   }
   if (q) {

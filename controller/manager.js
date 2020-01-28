@@ -118,7 +118,7 @@ const getSituation = (page, size) => {
 
 const getTimes = () => {
   const sql = `
-      select customerName, customerIdentity, tel, count(*) as num from liverecord group by customerName ORDER BY num DESC
+      select customerName, customerIdentity, tel, count(*) as num from liverecord group by customerIdentity ORDER BY num DESC
   `
   return exec(sql).then(rows => {
     return rows

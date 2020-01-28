@@ -62,7 +62,7 @@ const delEmployeeList = (id) => {
 const getRoomList = (page, size, q) => {
   console.log(q)
   let sql = `
-      select id, number, price, isRent from rooms where 1 = 1
+      select id, type, number, price, isRent from rooms where 1 = 1
   `
   if (q) {
     sql += `
@@ -90,18 +90,18 @@ const getRoomList = (page, size, q) => {
   })
 }
 
-const addRoom = (number, price, isRent) => {
+const addRoom = (number, price, isRent, type) => {
   const sql = `
-     INSERT INTO rooms VALUES (null, '${number}', '${price}', 0, 0, '', ${isRent}, '', '', '', '', 0, '', '')
+     INSERT INTO rooms VALUES (null, '${number}', '${price}', 0, 0, '', '${isRent}', '', '', '', '', 0, '', '', '', '', '${type}')
   `
   return exec(sql).then(rows => {
     return rows
   })
 }
 
-const editRoom = (id, number, price, isRent) => {
+const editRoom = (id, number, price, isRent, type) => {
   const sql = `
-     UPDATE rooms SET number = '${number}', price = '${price}', isRent = '${isRent}' WHERE id = '${id}'
+     UPDATE rooms SET number = '${number}', type = '${type}', price = '${price}', isRent = '${isRent}' WHERE id = '${id}'
   `
   return exec(sql).then(rows => {
     return rows

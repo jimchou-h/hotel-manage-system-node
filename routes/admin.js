@@ -125,8 +125,8 @@ router.post('/room/list', async function (req, res, next) {
 });
 
 router.post('/room/add', async function (req, res, next) {
-    const { number, price, isRent } = req.body
-    let paramsResult = await checkParams(res, number, price, isRent)
+    const { number, price, isRent, type } = req.body
+    let paramsResult = await checkParams(res, number, price, isRent, type)
     if (!paramsResult) {
         return;
     }
@@ -134,7 +134,7 @@ router.post('/room/add', async function (req, res, next) {
     if (!checkResult) {
         return;
     }
-    const result = addRoom(number, price, isRent)
+    const result = addRoom(number, price, isRent, type)
     return result.then(data => {
         if (data.affectedRows == 1) {
             res.json(
@@ -149,8 +149,8 @@ router.post('/room/add', async function (req, res, next) {
 });
 
 router.post('/room/edit', async function (req, res, next) {
-    const { id, number, price, isRent } = req.body
-    let paramsResult = await checkParams(res, id, number, price, isRent)
+    const { id, number, price, isRent, type } = req.body
+    let paramsResult = await checkParams(res, id, number, price, isRent, type)
     if (!paramsResult) {
         return;
     }
@@ -158,7 +158,7 @@ router.post('/room/edit', async function (req, res, next) {
     if (!checkResult) {
         return;
     }
-    const result = editRoom(id, number, price, isRent)
+    const result = editRoom(id, number, price, isRent, type)
     return result.then(data => {
         if (data.affectedRows == 1) {
             res.json(
