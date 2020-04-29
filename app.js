@@ -1,6 +1,11 @@
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var createError = require('http-errors');
+// var test = require('./test.js');
+// test();
+
+var CronJob = require('cron').CronJob;
+const { setCard } = require('./controller/common.js')
 
 const commonRouter = require('./routes/common')
 const adminRouter = require('./routes/admin')
@@ -25,6 +30,10 @@ app.all('*', (req, res, next) => {
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS, DELETE');
   next()
 });
+
+new CronJob('00 00 00 * * *', function() {
+  setCard();
+}, null, true);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

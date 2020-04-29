@@ -1,4 +1,6 @@
-const { exec } = require('../db/mysql')
+const {
+  exec
+} = require('../db/mysql')
 
 const getCleanerList = (page, size, q) => {
   let sql = `
@@ -31,15 +33,18 @@ const getCleanerList = (page, size, q) => {
 
 const setRoomClean = (ids, name) => {
   let d = new Date();
-  let cleantime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() +
-  ':' + d.getMinutes() + ':' + d.getSeconds();
+  let cleantime = d.getFullYear() + '-' + ((d.getMonth() + 1) < 10 ? '0' : '') + (d.getMonth() + 1) + '-' + (d.getDate() <
+    10 ? '0' : '') + d.getDate() + ' ' + (d.getHours() < 10 ? '0' : '') + d.getHours() + ':' + (d.getMinutes() <
+    10 ? '0' : '') + d.getMinutes() + ':' + (d.getSeconds() < 10 ? '0' : '') + d.getSeconds();
   let sql = ""
   if (ids.length == 1) {
-    sql = `
+    sql =
+      `
         UPDATE rooms SET isClean = 1, cleaner = '${name}', cleantime = '${cleantime}' WHERE id = '${ids[0]}';
     `
   } else {
-    sql = `
+    sql =
+      `
         UPDATE rooms SET isClean = 1, cleaner = '${name}', cleantime = '${cleantime}' WHERE id = '${ids[0]}'
     `
     for (let i = 1, j = ids.length; i < j; i++) {
@@ -84,8 +89,18 @@ const setRoomUnclean = (ids) => {
   })
 }
 
+const receiveTask = (id, name) => {
+  const sql = `
+      UPDATE rooms SET isClean = 2, cleaner = '${name}' WHERE id = '${id}';
+  `
+  return exec(sql).then(rows => {
+    return rows
+  })
+}
+
 module.exports = {
   getCleanerList,
   setRoomClean,
-  setRoomUnclean
+  setRoomUnclean,
+  receiveTask
 }

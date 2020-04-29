@@ -1,4 +1,6 @@
-const { exec } = require('../db/mysql')
+const {
+  exec
+} = require('../db/mysql')
 
 const setallowPayment = (ids) => {
   let sql = ""
@@ -97,7 +99,7 @@ const getSituation = (page, size) => {
     if (rows.length > 0) {
       for (let i = 0, j = rows.length; i < j; i++) {
         if (rows[i].star > 3) {
-          satisify ++
+          satisify++
         }
       }
       if (page == 1) {
@@ -116,14 +118,60 @@ const getSituation = (page, size) => {
   })
 }
 
-const getTimes = () => {
+const getTimes = (page, size) => {
   const sql = `
-      select customerName, customerIdentity, tel, count(*) as num from liverecord group by customerIdentity ORDER BY num DESC
+      select customerName, customerIdentity, tel, count(*) as num, sum(totalPrice) as total from liverecord group by customerIdentity ORDER BY num DESC
+  `
+  return exec(sql).then(rows => {
+    let data = {};
+    data.page = page;
+    data.size = size;
+    data.total = rows.length;
+    if (page == 1) {
+      data.rows = rows.slice(0, size);
+    } else {
+      data.rows = rows.slice((page - 1) * size, page * size);
+    }
+    return data
+  })
+}
+
+const getDayPeriod = (preDate, currentDate) => {
+  let sql = `
+    SELECT DATE_FORMAT(liveTime,'%Y-%m-%d') as time , count(*) as count FROM liverecord where 1 = 1 
+  `
+  if (preDate) {
+    sql += `and liveTime between '${preDate}' `
+    if (currentDate) {
+      sql += `and '${currentDate}' `
+    } else {
+      sql += `and now() `
+    }
+  }
+  sql += `GROUP BY time`
+  return exec(sql).then(rows => {
+    return rows
+  })
+}
+
+const getCardList = () => {
+  const sql = `
+    select id, name, sex, identity, position, tel, card, cardTime from employees
   `
   return exec(sql).then(rows => {
     return rows
   })
 }
+
+const getCustomerLiveDetail = (customerIdentity) => {
+  const sql = `
+    select liveTime, leaveTime, customerName, deposit, number, totalPrice from liverecord where customerIdentity = '${customerIdentity}'
+  `
+  return exec(sql).then(rows => {
+    return rows
+  })
+}
+
 
 module.exports = {
   setallowPayment,
@@ -131,5 +179,8 @@ module.exports = {
   getTotalIncome,
   getTotalPay,
   getSituation,
-  getTimes
+  getTimes,
+  getDayPeriod,
+  getCardList,
+  getCustomerLiveDetail
 }

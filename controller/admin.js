@@ -31,7 +31,7 @@ const getEmployeeList = (page, size, q) => {
 const addEmployeeList = (name, loginName, sex, age, identity, password, position, tel, salary) => {
   console.log(salary)
   const sql = `
-     INSERT INTO employees VALUES (null, '${name}', '${loginName}', '${sex}', '${age}', '${identity}', '${password}', '${position}', '${salary}', '${tel}')
+     INSERT INTO employees VALUES (null, '${name}', '${loginName}', '${sex}', '${age}', '${identity}', '${password}', '${position}', '${salary}', '${tel}', 0, '')
   `
   return exec(sql).then(rows => {
     return rows

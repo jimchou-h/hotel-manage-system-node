@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const { login } = require('../controller/common')
+const { login, getRealName, setPersonCard, checkPersonCard } = require('../controller/common')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 
 router.post('/login', function (req, res, next) {
@@ -12,7 +12,10 @@ router.post('/login', function (req, res, next) {
             req.session.loginName = data.loginName
             req.session.position = data.position
             res.json(
-                new SuccessModel()
+                new SuccessModel({
+                  name: data.name,
+                  card: data.card
+                })
             )
             return
         }
@@ -27,6 +30,40 @@ router.post('/logout', function (req, res, next) {
         req.session.destroy();
         res.json(
             new SuccessModel()
+        )
+    })
+});
+
+router.post('/setcard', function (req, res, next) {
+    const { loginName, position, cardTime } = req.body
+    const result = setPersonCard(loginName, position, cardTime)
+    return result.then(data => {
+        if (data.affectedRows > 0) {
+            res.json(
+                new SuccessModel()
+            )
+            return
+        }
+        res.json(
+            new ErrorModel('打卡失败')
+        )
+    })
+});
+
+router.post('/checkcard', function (req, res, next) {
+    const { loginName, position } = req.body
+    const result = checkPersonCard(loginName, position)
+    return result.then(data => {
+        if (data) {
+            res.json(
+                new SuccessModel({
+                  card: data.card
+                })
+            )
+            return
+        }
+        res.json(
+            new ErrorModel()
         )
     })
 });

@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const { getCleanerList, setRoomClean, setRoomUnclean } = require('../controller/cleaner')
+const { getCleanerList, setRoomClean, setRoomUnclean, receiveTask } = require('../controller/cleaner')
 const { checkParams } = require('../utils/methods')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 
@@ -68,6 +68,26 @@ router.post('/unset', async function (req, res, next) {
       }
       res.json(
           new ErrorModel('设置客房状态失败')
+      )
+  })
+});
+
+router.post('/receive', async function (req, res, next) {
+  const { id, name } = req.body
+  let checkResult = await checkPower(req.session, res)
+  if (!checkResult) {
+      return;
+  }
+  const result = receiveTask(id, name)
+  return result.then(data => {
+      if (data.affectedRows > 0) {
+          res.json(
+              new SuccessModel()
+          )
+          return
+      }
+      res.json(
+          new ErrorModel('接受失败')
       )
   })
 });

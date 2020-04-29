@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const { setallowPayment, setdisallowPayment, getTotalIncome, getTotalPay, getSituation, getTimes } = require('../controller/manager')
+const { setallowPayment, setdisallowPayment, getTotalIncome, getTotalPay, getSituation, getTimes, getDayPeriod, getCardList, getCustomerLiveDetail } = require('../controller/manager')
 const { checkParams } = require('../utils/methods')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 
@@ -84,12 +84,70 @@ router.post('/report/two', async function (req, res, next) {
 });
 
 router.post('/report/three', async function (req, res, next) {
+  const { page, size } = req.body
   let checkResult = await checkPower(req.session, res)
   if (!checkResult) {
       return;
   }
-  const times = getTimes()
+  const times = getTimes(page, size)
   return times.then(data => {
+    res.json(
+      new SuccessModel(data)
+    )
+    return
+  });
+});
+
+router.post('/report/three/detail', async function (req, res, next) {
+  const { customerIdentity } = req.body
+  let paramsResult = await checkParams(res, customerIdentity)
+  if (!paramsResult) {
+      return;
+  }
+  let checkResult = await checkPower(req.session, res)
+  if (!checkResult) {
+      return;
+  }
+  const detail = getCustomerLiveDetail(customerIdentity)
+  return detail.then(data => {
+    res.json(
+      new SuccessModel(data)
+    )
+    return
+  });
+});
+
+router.post('/report/dayperiod', async function (req, res, next) {
+  const { preDate, currentDate } = req.body
+  let checkResult = await checkPower(req.session, res)
+  if (!checkResult) {
+      return;
+  }
+  const period = getDayPeriod(preDate, currentDate)
+  return period.then(data => {
+    console.log(data)
+    let xData = [], yData = []
+    data.map(item => {
+      xData.push(item.time)
+      yData.push(item.count)
+    })
+    res.json(
+      new SuccessModel({
+        xData,
+        yData
+      })
+    )
+    return
+  });
+});
+
+router.post('/report/cardlist', async function (req, res, next) {
+  let checkResult = await checkPower(req.session, res)
+  if (!checkResult) {
+      return;
+  }
+  const cardlist = getCardList()
+  return cardlist.then(data => {
     res.json(
       new SuccessModel(data)
     )
@@ -99,7 +157,6 @@ router.post('/report/three', async function (req, res, next) {
 
 // 检查权限
 function checkPower(session, res) {
-  console.log(session)
   if (!session.position || session.position != "manager") {
     res.json(
       new ErrorModel('你没有操作权限')
